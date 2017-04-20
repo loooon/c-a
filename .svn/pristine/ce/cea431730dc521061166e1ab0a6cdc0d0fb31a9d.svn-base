@@ -1,0 +1,26 @@
+package com.credit.service;
+
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.Admin;
+import com.credit.entity.User;
+
+/**
+ * Created by Michael Chan on 4/1/2017.
+ */
+public interface AdminService
+{
+    Admin searchByName(String userName);
+
+    Pager<Admin> searchPage(UserQuery query);
+
+    Admin searchAdminByPhone(String phone);
+
+    Integer save(String password,String email,Admin admin) throws Exception;
+
+    Integer update(Admin admin);
+
+    Admin searchByIdAndParam(Integer id, String userName, String param);
+
+    Admin searchByParam(String paramName, String paramValue);
+}

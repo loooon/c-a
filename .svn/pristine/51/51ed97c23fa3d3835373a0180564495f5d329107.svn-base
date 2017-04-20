@@ -1,0 +1,31 @@
+package com.credit.service.impl;
+
+import com.credit.dao.SiteResourceMapper;
+import com.credit.entity.SiteResource;
+import com.credit.service.SiteResourceService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * Created by Michael Chan on 4/5/2017.
+ */
+@Service("siteResourceService")
+public class SiteResourceServiceImpl implements SiteResourceService
+{
+    @Resource
+    private SiteResourceMapper siteResourceMapper;
+
+    @Override
+    public List<SiteResource> searchSiteResourceByNames(String[] resourcesNames)
+    {
+        return siteResourceMapper.selectByResourceNameIn(resourcesNames);
+    }
+
+    @Override
+    public List<String> searchAllResourceNames()
+    {
+        return siteResourceMapper.selectDistinctResourceName();
+    }
+}

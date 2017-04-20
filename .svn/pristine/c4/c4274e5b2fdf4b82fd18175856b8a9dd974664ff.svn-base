@@ -1,0 +1,25 @@
+package com.credit.dao;
+
+import java.util.List;
+
+import com.credit.dao.query.PageQuery;
+import com.credit.entity.User;
+
+public interface UserMapper
+{
+    int deleteByPrimaryKey(Integer userId);
+
+    int insert(User record);
+
+    int insertSelective(User record);
+
+    User selectByPrimaryKey(Integer userId);
+
+    int updateByPrimaryKeySelective(User record);
+
+    int updateByPrimaryKey(User record);
+
+    List<User> selectByPage(PageQuery query);
+
+    int countByPage(PageQuery query);
+}

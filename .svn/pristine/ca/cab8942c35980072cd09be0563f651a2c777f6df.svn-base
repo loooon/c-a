@@ -1,0 +1,19 @@
+package com.credit.dao.query;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+public class UserQuery extends PageQuery
+{
+    private Sort sort = new Sort();
+
+    public Sort getSort()
+    {
+        return sort;
+    }
+
+    public void setSort(Sort sort)
+    {
+        this.sort = sort;
+    }
+}

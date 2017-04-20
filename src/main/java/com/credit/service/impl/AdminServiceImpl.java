@@ -1,0 +1,82 @@
+package com.credit.service.impl;
+
+import com.credit.common.util.security.DigestUtils;
+import com.credit.dao.AdminMapper;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.Admin;
+import com.credit.entity.User;
+import com.credit.service.AdminService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by Michael Chan on 4/1/2017.
+ */
+@Service("adminService")
+public class AdminServiceImpl implements AdminService
+{
+    @Resource
+    private AdminMapper adminMapper;
+
+    @Override
+    public Admin searchByName(String userName)
+    {
+        return adminMapper.selectByStringParam("user_name",userName);
+    }
+
+    @Override
+    public Pager<Admin> searchPage(UserQuery query)
+    {
+        List<Admin> admins = adminMapper.selectByPage(query);
+        int count = adminMapper.countByPage(query);
+        return new Pager<>(query, admins, count);
+    }
+
+    @Override
+    public Admin searchAdminByPhone(String phone)
+    {
+        return adminMapper.selectByStringParam("phone",phone);
+    }
+
+    @Override
+    public Integer save(String password,String email,Admin admin) throws Exception
+    {
+        String md5Password = DigestUtils.md5(DigestUtils.md5(password.getBytes("UTF-8")).getBytes("UTF-8"));
+        admin.setPassword(md5Password);
+        admin.setEmail(email);
+        admin.setCreateTime(new Date());
+        admin.setRole("系统操作员");
+        admin.setUpdateTime(new Date());
+        return adminMapper.insert(admin);
+    }
+
+    @Override
+    public Integer update(Admin admin)
+    {
+        if (admin.getEmail().trim().equals(""))
+        {
+            admin.setEmail(null);
+        }else {
+            String email = admin.getEmail().trim() + "@pingansec.com";
+            admin.setEmail(email);
+        }
+        admin.setUpdateTime(new Date());
+        return adminMapper.updateByPrimaryKeySelective(admin);
+    }
+
+    @Override
+    public Admin searchByIdAndParam(Integer id, String paramName,String paramValue)
+    {
+        return adminMapper.selectByIdAndName(id,paramName,paramValue);
+    }
+
+    @Override
+    public Admin searchByParam(String paramName, String paramValue)
+    {
+        return adminMapper.selectByStringParam(paramName,paramValue);
+    }
+}

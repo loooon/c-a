@@ -1,0 +1,28 @@
+package com.credit.service;
+
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.User;
+import com.credit.entity.dto.UserResourceDto;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+public interface UserService
+{
+    Pager<User> searchPage(UserQuery userQuery);
+
+    Integer save(String userName, String vkey, User user, String password)  throws Exception;
+
+    User searchUserByPhone(String phone);
+
+    Pager<UserResourceDto> searchDtoPage(UserQuery query);
+
+    User searchUserByUserName(String userName);
+
+    Integer updateUserBaseInfo(User user);
+
+    User searchUserById(Integer userId);
+
+    User searchUserByIdAndUserName(Integer userId, String userName);
+}

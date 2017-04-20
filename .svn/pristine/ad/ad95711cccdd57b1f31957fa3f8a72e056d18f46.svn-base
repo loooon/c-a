@@ -1,0 +1,87 @@
+package com.credit.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import com.credit.common.util.RandomUtil;
+import com.credit.common.util.security.DigestUtils;
+import com.credit.common.util.time.TimeUtil;
+import com.credit.service.UserPermissionService;
+import com.credit.web.util.PinYinUtil;
+import com.credit.web.util.VkeyHelp;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
+import com.credit.dao.UserMapper;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.User;
+import com.credit.service.UserService;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+@Service("userService")
+public class UserServiceImpl implements UserService
+{
+    @Resource
+    private UserMapper userMapper;
+
+    @Resource
+    private UserPermissionService userPermissionService;
+
+    @Override
+    public Pager<User> searchPage(UserQuery query)
+    {
+        List<User> userList = userMapper.selectByPage(query);
+        int count = userMapper.countByPage(query);
+        return new Pager<>(query, userList, count);
+    }
+
+    @Override
+    public Integer save(String vkey,User user,String password,Integer[] searchServices) throws Exception
+    {
+        // 重新计算摘要
+        String md5Password = DigestUtils.md5(DigestUtils.md5(password.getBytes("UTF-8")).getBytes("UTF-8"));
+        user.setVkey(vkey);
+        user.setPassword(md5Password);
+        String companyName = user.getUserName();
+        if (companyName.endsWith("股份有限公司"))
+        {
+            companyName = companyName.replace("股份有限公司", "");
+        }else if(companyName.endsWith("有限公司"))
+        {
+            companyName = companyName.replace("有限公司", "");
+        }else if(companyName.endsWith("公司"))
+        {
+            companyName = companyName.replace("公司", "");
+        }
+        String userNickPinYinName = PinYinUtil.getFirstSpell(companyName);
+        String productPinYinName = PinYinUtil.getFirstSpell(user.getProductName());
+        String userNickName = "";
+        if (StringUtils.isNotBlank(productPinYinName))
+        {
+            userNickName = productPinYinName+ RandomUtil.genRandomNumberString(4);
+        }else {
+            userNickName = userNickPinYinName + RandomUtil.genRandomNumberString(4);
+        }
+        Date regTime = new Date();
+        user.setUserNickname(userNickName);
+        user.setUserType(1);
+        user.setVerifyStateCode(2);
+        user.setRegTime(regTime);
+        user.setExpireDate(TimeUtil.getFutureYearDate(regTime,2));
+        Integer interUser =  userMapper.insert(user);
+        userPermissionService.save(user.getUserId(),vkey,searchServices);
+        return interUser;
+    }
+
+    @Override
+    public User searchUserByPhone(String phone)
+    {
+        return userMapper.selectByPhone(phone);
+    }
+}

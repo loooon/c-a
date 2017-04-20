@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.credit.dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.credit.entity.User" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="vkey" property="vkey" jdbcType="VARCHAR" />
+    <result column="user_no" property="userNo" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="expire_date" property="expireDate" jdbcType="TIMESTAMP" />
+    <result column="verify_state_code" property="verifyStateCode" jdbcType="INTEGER" />
+    <result column="verify_state_name" property="verifyStateName" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="user_nickname" property="userNickname" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="reg_time" property="regTime" jdbcType="TIMESTAMP" />
+    <result column="visits" property="visits" jdbcType="INTEGER" />
+    <result column="last_logintime" property="lastLogintime" jdbcType="TIMESTAMP" />
+    <result column="user_type" property="userType" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="sms_upload_count" property="smsUploadCount" jdbcType="INTEGER" />
+    <result column="dun_number_mark_count" property="dunNumberMarkCount" jdbcType="INTEGER" />
+    <result column="call_detail_mark_count" property="callDetailMarkCount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, vkey, user_no, user_name, company_name, product_name, expire_date, verify_state_code, 
+    verify_state_name, email, user_nickname, password, reg_time, visits, last_logintime, 
+    user_type, phone, sms_upload_count, dun_number_mark_count, call_detail_mark_count
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.credit.entity.User" >
+    insert into tb_user (user_id, vkey, user_no, 
+      user_name, company_name, product_name, 
+      expire_date, verify_state_code, verify_state_name, 
+      email, user_nickname, password, 
+      reg_time, visits, last_logintime, 
+      user_type, phone, sms_upload_count, 
+      dun_number_mark_count, call_detail_mark_count
+      )
+    values (#{userId,jdbcType=INTEGER}, #{vkey,jdbcType=VARCHAR}, #{userNo,jdbcType=VARCHAR}, 
+      #{userName,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, 
+      #{expireDate,jdbcType=TIMESTAMP}, #{verifyStateCode,jdbcType=INTEGER}, #{verifyStateName,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{userNickname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{regTime,jdbcType=TIMESTAMP}, #{visits,jdbcType=INTEGER}, #{lastLogintime,jdbcType=TIMESTAMP}, 
+      #{userType,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{smsUploadCount,jdbcType=INTEGER}, 
+      #{dunNumberMarkCount,jdbcType=INTEGER}, #{callDetailMarkCount,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.credit.entity.User" >
+    insert into tb_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="vkey != null" >
+        vkey,
+      </if>
+      <if test="userNo != null" >
+        user_no,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="companyName != null" >
+        company_name,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="expireDate != null" >
+        expire_date,
+      </if>
+      <if test="verifyStateCode != null" >
+        verify_state_code,
+      </if>
+      <if test="verifyStateName != null" >
+        verify_state_name,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="userNickname != null" >
+        user_nickname,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="regTime != null" >
+        reg_time,
+      </if>
+      <if test="visits != null" >
+        visits,
+      </if>
+      <if test="lastLogintime != null" >
+        last_logintime,
+      </if>
+      <if test="userType != null" >
+        user_type,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="smsUploadCount != null" >
+        sms_upload_count,
+      </if>
+      <if test="dunNumberMarkCount != null" >
+        dun_number_mark_count,
+      </if>
+      <if test="callDetailMarkCount != null" >
+        call_detail_mark_count,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="vkey != null" >
+        #{vkey,jdbcType=VARCHAR},
+      </if>
+      <if test="userNo != null" >
+        #{userNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null" >
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="expireDate != null" >
+        #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="verifyStateCode != null" >
+        #{verifyStateCode,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStateName != null" >
+        #{verifyStateName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userNickname != null" >
+        #{userNickname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="regTime != null" >
+        #{regTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="visits != null" >
+        #{visits,jdbcType=INTEGER},
+      </if>
+      <if test="lastLogintime != null" >
+        #{lastLogintime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="smsUploadCount != null" >
+        #{smsUploadCount,jdbcType=INTEGER},
+      </if>
+      <if test="dunNumberMarkCount != null" >
+        #{dunNumberMarkCount,jdbcType=INTEGER},
+      </if>
+      <if test="callDetailMarkCount != null" >
+        #{callDetailMarkCount,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.credit.entity.User" >
+    update tb_user
+    <set >
+      <if test="vkey != null" >
+        vkey = #{vkey,jdbcType=VARCHAR},
+      </if>
+      <if test="userNo != null" >
+        user_no = #{userNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null" >
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="expireDate != null" >
+        expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="verifyStateCode != null" >
+        verify_state_code = #{verifyStateCode,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStateName != null" >
+        verify_state_name = #{verifyStateName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userNickname != null" >
+        user_nickname = #{userNickname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="regTime != null" >
+        reg_time = #{regTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="visits != null" >
+        visits = #{visits,jdbcType=INTEGER},
+      </if>
+      <if test="lastLogintime != null" >
+        last_logintime = #{lastLogintime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userType != null" >
+        user_type = #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="smsUploadCount != null" >
+        sms_upload_count = #{smsUploadCount,jdbcType=INTEGER},
+      </if>
+      <if test="dunNumberMarkCount != null" >
+        dun_number_mark_count = #{dunNumberMarkCount,jdbcType=INTEGER},
+      </if>
+      <if test="callDetailMarkCount != null" >
+        call_detail_mark_count = #{callDetailMarkCount,jdbcType=INTEGER},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.credit.entity.User" >
+    update tb_user
+    set vkey = #{vkey,jdbcType=VARCHAR},
+      user_no = #{userNo,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      expire_date = #{expireDate,jdbcType=TIMESTAMP},
+      verify_state_code = #{verifyStateCode,jdbcType=INTEGER},
+      verify_state_name = #{verifyStateName,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      user_nickname = #{userNickname,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      reg_time = #{regTime,jdbcType=TIMESTAMP},
+      visits = #{visits,jdbcType=INTEGER},
+      last_logintime = #{lastLogintime,jdbcType=TIMESTAMP},
+      user_type = #{userType,jdbcType=INTEGER},
+      phone = #{phone,jdbcType=VARCHAR},
+      sms_upload_count = #{smsUploadCount,jdbcType=INTEGER},
+      dun_number_mark_count = #{dunNumberMarkCount,jdbcType=INTEGER},
+      call_detail_mark_count = #{callDetailMarkCount,jdbcType=INTEGER}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+
+
+  <!-- 以下为新添加方法-->
+  <select id="selectByPage" parameterType="com.credit.dao.query.UserQuery" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/> FROM tb_user WHERE 1=1
+    <if test="userName!=null and userName !=''">
+      AND  user_name like CONCAT(#{userName},'%')
+    </if>
+    ORDER BY
+    <if test="sort.property != null and sort.property != ''">
+      ${sort.property} ${sort.direction},
+    </if>
+    user_id DESC
+    <include refid="Page.footer"/>
+  </select>
+
+  <select id="countByPage" parameterType="com.credit.dao.query.UserQuery" resultType="int">
+    SELECT count(*) FROM tb_user WHERE 1=1
+    <if test="userName!=null and userName !=''">
+      AND  user_name like CONCAT(#{userName},'%')
+    </if>
+  </select>
+
+  <select id="selectByStringParam" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_user
+    <where>
+      <if test="param1 !=null and param1 != ''">
+        ${param1} = #{1,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByDtoPage" resultType="com.credit.entity.dto.UserResourceDto" parameterType="com.credit.dao.query.UserQuery">
+    <![CDATA[
+        select u.user_id as userId, u.user_name as userName ,u.vkey as vkey,u.company_name as companyName,u.product_name as productName,u.phone as phone,u.email as email,u.expire_date as expireDate,group_concat(upe.resource_id separator '<br/>') as
+        resourceId,upe.daily_times as dailyTimes,upe.yearly_times as yearlyTimes, group_concat(sr.resource_path separator '<br/>') as resourcePath ,group_concat(sr.resource_name separator '<br/>')  as resourceName from tb_user_permission  as upe right JOIN tb_user as u on upe.user_id = u.user_id left JOIN tb_site_resource  as sr on upe.resource_id = sr.resource_id
+          ]]>
+    <if test="userName!=null and userName !=''">
+      where u.user_name like concat(#{userName},'%')
+    </if>
+    group by u.user_id ORDER BY
+    <if test="sort.property != null and sort.property != '' and sort.property !='daily_times' and sort.property !='yearly_times' and sort.property != 'resource_name'">
+      u.${sort.property} ${sort.direction},
+    </if>
+    <if test="sort.property != null and sort.property =='daily_times' or sort.property =='yearly_times'">
+      upe.${sort.property} ${sort.direction},
+    </if>
+    <if test="sort.property != null and sort.property =='resource_name'">
+      resourceName ${sort.direction},
+    </if>
+    u.user_id DESC
+    <include refid="Page.footer"/>
+  </select>
+</mapper>

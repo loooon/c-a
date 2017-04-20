@@ -1,0 +1,24 @@
+package com.credit.service.impl;
+
+import com.credit.dao.AdminMapper;
+import com.credit.entity.Admin;
+import com.credit.service.AdminService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+/**
+ * Created by Michael Chan on 4/1/2017.
+ */
+@Service("adminService")
+public class AdminServiceImpl implements AdminService
+{
+    @Resource
+    private AdminMapper adminMapper;
+
+    @Override
+    public Admin searchByName(String userName)
+    {
+        return adminMapper.selectByUserName(userName);
+    }
+}

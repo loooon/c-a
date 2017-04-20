@@ -1,0 +1,153 @@
+package com.credit.web.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.credit.common.result.ResultJson;
+import com.credit.common.util.RandomUtil;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.SiteResource;
+import com.credit.entity.Sms;
+import com.credit.entity.User;
+import com.credit.service.SiteResourceService;
+import com.credit.service.SmsService;
+import com.credit.service.UserPermissionService;
+import com.credit.service.UserService;
+import com.credit.web.util.VkeyHelp;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+@Controller
+@RequestMapping("/user")
+public class UserController extends AbstractBaseController
+{
+    @Value("${sms.register.template}")
+    private String registerTemplate;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private SmsService smsService;
+
+    @Resource
+    private UserPermissionService userPermissionService;
+
+    @Resource
+    private SiteResourceService siteResourceService;
+
+    @RequestMapping("/list")
+    public String toList()
+    {
+
+        return "/user_list";
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson list(UserQuery query)
+    {
+        Pager<User> userPage = userService.searchPage(query);
+        return new ResultJson().success(userPage);
+    }
+
+    @RequestMapping("/add")
+    public String addUser(Model model)
+    {
+        List<String> siteResourceNames = siteResourceService.searchAllResourceNames();
+        model.addAttribute("siteResourceNames", siteResourceNames);
+        return "/user_add";
+    }
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson ajaxAddUser(User user,String[] searchService)
+    {
+        try
+        {
+            if (user == null || user.getUserName() == null || user.getPhone() == null || searchService == null)
+            {
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR_MESSAGE);
+            }
+            String password = RandomUtil.genRandomString(8);
+            String vkey = VkeyHelp.generateVkey(new Date());
+            userService.save(vkey,user,password);
+            List<SiteResource> siteResources = siteResourceService.searchSiteResourceByNames(searchService);
+            userPermissionService.save(user.getUserId(),vkey,siteResources);
+            String content = registerTemplate.replace("#companyName#", user.getUserName());
+            content = content.replace("#userNickName#", user.getUserNickname());
+            content = content.replace("#vkey#", vkey);
+            content = content.replace("#password#", password);
+            Sms sms = new Sms();
+            sms.setCreateTime(new Date());
+            sms.setReceiver(user.getPhone());
+            sms.setSmsContent(content);
+            smsService.saveSend(sms);
+        } catch (Exception e)
+        {
+            logger.error("添加用户异常", e);
+            return new ResultJson().error("添加用户异常");
+        }
+        return new ResultJson().success(user.getUserName());
+    }
+
+	@RequestMapping("/form")
+	public String form()
+	{
+		return "form";
+	}
+
+    @RequestMapping(value = "/exist",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isPhoneExist(String phone)
+    {
+        User user;
+        try
+        {
+            user = userService.searchUserByPhone(phone);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return user == null;
+    }
+
+    public ResultJson sendCode(String receiver)
+    {
+        if(StringUtils.isBlank(receiver))
+        {
+            return new ResultJson().paramError("手机号不能为空");
+        }
+        String code = RandomUtil.genRandomNumberString(6);
+        String content = registerTemplate.replace("#code#", code);
+        Sms sms = new Sms();
+        sms.setCreateTime(new Date());
+        sms.setReceiver(receiver);
+        sms.setSmsContent(content);
+        sms.setSmsCode(code);
+        try
+        {
+            sms = smsService.saveSend(sms);
+        }
+        catch (Exception e)
+        {
+            logger.error("发送短信异常", e);
+            return new ResultJson().error(ResultJson.STATUS_CODE_FAIL, "发送失败");
+        }
+        return new ResultJson().success(sms.getSmsId());
+    }
+}

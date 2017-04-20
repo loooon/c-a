@@ -1,0 +1,11 @@
+sms.send.url=https://api.ums86.com:9600/sms/Api/Send.do
+sms.username=shpazx
+sms.password=Sunz@@
+sms.company.code=239810
+
+sms.expire.second=600
+
+#sms.register.template=尊敬的#companyName#您好：您的账号已开户成功。登录用户名为#userNickName#，vkey：#vkey#，初始密码：#password#【凭安信用】
+#sms.register.template=您的验证码为123456
+
+sms.register.template=尊敬的#companyName#您好：您的账号已开户成功。用户名：#userNickName#，vkey：#vkey#，初始密码：#password#

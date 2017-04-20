@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.credit.dao.SmsMapper" >
+  <resultMap id="BaseResultMap" type="com.credit.entity.Sms" >
+    <id column="sms_id" property="smsId" jdbcType="INTEGER" />
+    <result column="receiver" property="receiver" jdbcType="VARCHAR" />
+    <result column="sms_serial_no" property="smsSerialNo" jdbcType="VARCHAR" />
+    <result column="sms_code" property="smsCode" jdbcType="VARCHAR" />
+    <result column="sms_content" property="smsContent" jdbcType="VARCHAR" />
+    <result column="sms_state" property="smsState" jdbcType="SMALLINT" />
+    <result column="sms_fail_reason" property="smsFailReason" jdbcType="VARCHAR" />
+    <result column="primary_result" property="primaryResult" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="lastupdatetime" property="lastupdatetime" jdbcType="TIMESTAMP" />
+    <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sms_id, receiver, sms_serial_no, sms_code, sms_content, sms_state, sms_fail_reason, 
+    primary_result, create_time, lastupdatetime, expire_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_sms
+    where sms_id = #{smsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_sms
+    where sms_id = #{smsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.credit.entity.Sms" >
+    insert into tb_sms (sms_id, receiver, sms_serial_no, 
+      sms_code, sms_content, sms_state, 
+      sms_fail_reason, primary_result, create_time, 
+      lastupdatetime, expire_time)
+    values (#{smsId,jdbcType=INTEGER}, #{receiver,jdbcType=VARCHAR}, #{smsSerialNo,jdbcType=VARCHAR}, 
+      #{smsCode,jdbcType=VARCHAR}, #{smsContent,jdbcType=VARCHAR}, #{smsState,jdbcType=SMALLINT}, 
+      #{smsFailReason,jdbcType=VARCHAR}, #{primaryResult,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastupdatetime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.credit.entity.Sms" >
+    insert into tb_sms
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="smsId != null" >
+        sms_id,
+      </if>
+      <if test="receiver != null" >
+        receiver,
+      </if>
+      <if test="smsSerialNo != null" >
+        sms_serial_no,
+      </if>
+      <if test="smsCode != null" >
+        sms_code,
+      </if>
+      <if test="smsContent != null" >
+        sms_content,
+      </if>
+      <if test="smsState != null" >
+        sms_state,
+      </if>
+      <if test="smsFailReason != null" >
+        sms_fail_reason,
+      </if>
+      <if test="primaryResult != null" >
+        primary_result,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="lastupdatetime != null" >
+        lastupdatetime,
+      </if>
+      <if test="expireTime != null" >
+        expire_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="smsId != null" >
+        #{smsId,jdbcType=INTEGER},
+      </if>
+      <if test="receiver != null" >
+        #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="smsSerialNo != null" >
+        #{smsSerialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="smsCode != null" >
+        #{smsCode,jdbcType=VARCHAR},
+      </if>
+      <if test="smsContent != null" >
+        #{smsContent,jdbcType=VARCHAR},
+      </if>
+      <if test="smsState != null" >
+        #{smsState,jdbcType=SMALLINT},
+      </if>
+      <if test="smsFailReason != null" >
+        #{smsFailReason,jdbcType=VARCHAR},
+      </if>
+      <if test="primaryResult != null" >
+        #{primaryResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastupdatetime != null" >
+        #{lastupdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTime != null" >
+        #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.credit.entity.Sms" >
+    update tb_sms
+    <set >
+      <if test="receiver != null" >
+        receiver = #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="smsSerialNo != null" >
+        sms_serial_no = #{smsSerialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="smsCode != null" >
+        sms_code = #{smsCode,jdbcType=VARCHAR},
+      </if>
+      <if test="smsContent != null" >
+        sms_content = #{smsContent,jdbcType=VARCHAR},
+      </if>
+      <if test="smsState != null" >
+        sms_state = #{smsState,jdbcType=SMALLINT},
+      </if>
+      <if test="smsFailReason != null" >
+        sms_fail_reason = #{smsFailReason,jdbcType=VARCHAR},
+      </if>
+      <if test="primaryResult != null" >
+        primary_result = #{primaryResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastupdatetime != null" >
+        lastupdatetime = #{lastupdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expireTime != null" >
+        expire_time = #{expireTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where sms_id = #{smsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.credit.entity.Sms" >
+    update tb_sms
+    set receiver = #{receiver,jdbcType=VARCHAR},
+      sms_serial_no = #{smsSerialNo,jdbcType=VARCHAR},
+      sms_code = #{smsCode,jdbcType=VARCHAR},
+      sms_content = #{smsContent,jdbcType=VARCHAR},
+      sms_state = #{smsState,jdbcType=SMALLINT},
+      sms_fail_reason = #{smsFailReason,jdbcType=VARCHAR},
+      primary_result = #{primaryResult,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      lastupdatetime = #{lastupdatetime,jdbcType=TIMESTAMP},
+      expire_time = #{expireTime,jdbcType=TIMESTAMP}
+    where sms_id = #{smsId,jdbcType=INTEGER}
+  </update>
+</mapper>

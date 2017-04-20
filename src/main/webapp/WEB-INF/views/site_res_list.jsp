@@ -1,0 +1,152 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: wangjunling
+  Date: 2017/3/31
+  Time: 15:17
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@include file="/WEB-INF/common/path.jsp"%>
+<link rel="stylesheet" href="${basePath}/resources/AdminLTE/plugins/datatables/dataTables.bootstrap.css">
+<input id="menuTarget" type="hidden" value="siteResourceList"/>
+<div class="wrapper">
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                接口服务
+                <%--<small>Optional description</small>--%>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> 接口服务</a></li>
+                <li class="active">服务列表</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">服务列表</h3>
+                </div>
+                <!-- /.box-header -->
+
+
+                <div class="box-body">
+                    <table id="siteResourceTable" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>服务名</th>
+                            <th>路径</th>
+                            <th>更新时间</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+
+        </section>
+        <!-- /.content -->
+
+
+    </div>
+    <!-- /.content-wrapper -->
+
+
+</div>
+
+
+
+<script src="${basePath}/resources/AdminLTE/js/datatables/jquery.dataTables.js"></script>
+<script src="${basePath}/resources/AdminLTE/plugins/datatables/dataTables.bootstrap.js"></script>
+
+<script>
+    var table;
+    $(document).ready(function () {
+
+        $('body').on('click', '[name="toUpdateBtn"]', function() {
+            var me = $(this);
+            location.href="${basePath}/resource/site/save?resourceId=" + me.attr("resource-id");
+        }).on('click','[name="deleteBtn"]', function () {
+            var me = $(this);
+            modals('',"确认删除此服务吗？",function () {
+
+             $.ajax({
+                    url : "${basePath}/resource/site/delete",
+                    type : "post",
+                    dataType : "json",
+                    data: {resourceId:me.attr("resource-id")},
+                    success : function(data) {
+                        if(data.result==0){
+//                            table.api().ajax.reload();
+                            table.ajax.reload();
+                        }
+                    }
+                });
+            });
+        });
+
+
+        table =  $('#siteResourceTable').DataTable({
+            serverSide: true,
+            ajax: function(data, callback, settings) {
+                $.post('${basePath}/resource/site/list', {
+                    pageSize: data.length,
+                    pageNum: data.start / data.length + 1,
+                    nameOrPath: $.trim(data.search.value),
+                    'sort.property' : data.order.length == 0 ? '' : data.columns[data.order[0].column].name==''?data.columns[data.order[0].column].data:data.columns[data.order[0].column].name,
+                    'sort.direction' : data.order.length == 0 ? '' : data.order[0].dir
+                }, function(res) {
+                    var data = res.data;
+                    callback({
+                        recordsTotal: data.totalCount,
+                        recordsFiltered: data.totalCount,
+                        data: data.data
+                    });
+                });
+            },
+            columnDefs: [
+                { defaultContent: '', targets: -1}
+            ],
+            order: [],
+            columns: [
+                {
+                    data: 'resourceName',
+                    name:'resource_name',
+                    width: '8%'
+                }, {
+                    data: 'resourcePath',
+                    name:'resource_path',
+                    width: '18%'
+                }, {
+                    data: 'updateTime',
+                    name: 'update_time',
+                    width: '8%'
+                }, {
+                    data: 'createTime',
+                    name: 'create_time',
+                    width: '8%'
+                }, {
+                    width: '14%',
+                    orderable: false,
+                    render: function(data, type, full, meta) {
+
+                        return '<button style="margin-right:5px;" type="button" class="btn btn-primary btn-xs" name="toUpdateBtn" resource-id="' + full.resourceId + '"><i class="fa fa-edit"></i>修改</button>'+
+                                '<button style="margin-right:5px;" type="button" class="btn btn-primary btn-xs" name="deleteBtn" resource-id="' + full.resourceId + '"><i class="fa fa-trash"></i>删除</button>';
+
+                    }
+                }
+            ]
+        });
+
+        $('.dataTables_filter input').attr('placeholder', '服务名或路径搜索');
+
+    });
+
+</script>

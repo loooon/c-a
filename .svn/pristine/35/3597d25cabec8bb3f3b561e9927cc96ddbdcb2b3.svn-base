@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.credit.dao.SiteResourceMapper" >
+  <resultMap id="BaseResultMap" type="com.credit.entity.SiteResource" >
+    <id column="resource_id" property="resourceId" jdbcType="INTEGER" />
+    <result column="resource_path" property="resourcePath" jdbcType="VARCHAR" />
+    <result column="resource_name" property="resourceName" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="resource_type" property="resourceType" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    resource_id, resource_path, resource_name, parent_id, resource_type, update_time, 
+    create_time
+  </sql>
+
+  <select id="selectByResourceNameIn" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_site_resource where resource_name in
+    <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="selectDistinctResourceName" resultType="java.lang.String">
+    select DISTINCT resource_name
+     FROM tb_site_resource
+  </select>
+
+  <select id="selectAllDistinctByResourceName" resultMap="BaseResultMap">
+    select  resource_id,resource_name
+    FROM tb_site_resource
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_site_resource
+    where resource_id = #{resourceId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_site_resource
+    where resource_id = #{resourceId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.credit.entity.SiteResource" >
+    insert into tb_site_resource (resource_id, resource_path, resource_name, 
+      parent_id, resource_type, update_time, 
+      create_time)
+    values (#{resourceId,jdbcType=INTEGER}, #{resourcePath,jdbcType=VARCHAR}, #{resourceName,jdbcType=VARCHAR}, 
+      #{parentId,jdbcType=INTEGER}, #{resourceType,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.credit.entity.SiteResource" >
+    insert into tb_site_resource
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="resourceId != null" >
+        resource_id,
+      </if>
+      <if test="resourcePath != null" >
+        resource_path,
+      </if>
+      <if test="resourceName != null" >
+        resource_name,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="resourceType != null" >
+        resource_type,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="resourceId != null" >
+        #{resourceId,jdbcType=INTEGER},
+      </if>
+      <if test="resourcePath != null" >
+        #{resourcePath,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceName != null" >
+        #{resourceName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="resourceType != null" >
+        #{resourceType,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.credit.entity.SiteResource" >
+    update tb_site_resource
+    <set >
+      <if test="resourcePath != null" >
+        resource_path = #{resourcePath,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceName != null" >
+        resource_name = #{resourceName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="resourceType != null" >
+        resource_type = #{resourceType,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where resource_id = #{resourceId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.credit.entity.SiteResource" >
+    update tb_site_resource
+    set resource_path = #{resourcePath,jdbcType=VARCHAR},
+      resource_name = #{resourceName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      resource_type = #{resourceType,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where resource_id = #{resourceId,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectByPage" parameterType="com.credit.dao.query.SiteResourceQuery" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM tb_site_resource WHERE 1=1
+        <if test="nameOrPath!=null and nameOrPath !=''">
+            AND  resource_name like CONCAT('%',#{nameOrPath},'%')
+            OR resource_path like CONCAT('%',#{nameOrPath},'%')
+        </if>
+        ORDER BY
+        <if test="sort.property != null and sort.property != ''">
+            ${sort.property} ${sort.direction},
+        </if>
+        resource_id DESC
+        <include refid="Page.footer"/>
+    </select>
+
+    <select id="countByPage" parameterType="com.credit.dao.query.SiteResourceQuery" resultType="int">
+        SELECT count(*) FROM tb_site_resource WHERE 1=1
+        <if test="nameOrPath!=null and nameOrPath !=''">
+            AND  resource_name like CONCAT('%',#{nameOrPath},'%')
+            OR resource_path like CONCAT('%',#{nameOrPath},'%')
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,168 @@
+package com.credit.web.controller;
+
+import java.util.Date;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.credit.common.result.ResultJson;
+import com.credit.common.util.RandomUtil;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.Admin;
+import com.credit.entity.Sms;
+import com.credit.service.AdminService;
+import com.credit.service.SmsService;
+
+/**
+ * Created by Michael Chan on 4/7/2017.
+ */
+@Controller
+@RequestMapping("/admin")
+public class AdminController extends AbstractBaseController
+{
+    @Value("${sms.register.template}")
+    private String registerTemplate;
+
+    @Resource
+    private AdminService adminService;
+
+    @Resource
+    private SmsService smsService;
+
+    @RequestMapping("/list")
+    public String toList()
+    {
+
+        return "/admin_list";
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson list(UserQuery query)
+    {
+        Pager<Admin> adminPage = adminService.searchPage(query);
+        return new ResultJson().success(adminPage);
+    }
+
+    @RequestMapping("/add")
+    public String addUser()
+    {
+        return "/admin_add";
+    }
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson ajaxAddAdmin(Admin admin)
+    {
+        try
+        {
+            if (admin.getUserName().trim().equals("") || admin.getEmail().trim().equals("") || admin.getPhone().trim().equals(""))
+            {
+                logger.error("添加操作员参数错误");
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR,"添加操作员参数错误");
+            }
+            String password = RandomUtil.genRandomString(8);
+            String email = admin.getEmail()+"@pingansec.com";
+            adminService.save(password,email,admin);
+            String content = registerTemplate.replace("#companyName#", admin.getUserName());
+            content = content.replace("#userName#", admin.getUserName());
+            content = content.replace("#vkey#", password);
+            content = content.replace("#password#", password);
+            Sms sms = new Sms();
+            sms.setCreateTime(new Date());
+            sms.setReceiver(admin.getPhone());
+            sms.setSmsContent(content);
+            smsService.saveSend(sms);
+        } catch (Exception e)
+        {
+            logger.error("添加操作员异常", e);
+            return new ResultJson().error("添加操作员异常");
+        }
+        return new ResultJson().success(admin.getUserName());
+    }
+
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson updateAdmin(Admin admin)
+    {
+        Integer updateNumber;
+        try
+        {
+            updateNumber = adminService.update(admin);
+        } catch (Exception e)
+        {
+            logger.error("更新操作员信息异常", e);
+            return new ResultJson().error("更新操作员信息异常");
+        }
+        return new ResultJson().success(updateNumber);
+    }
+
+    @RequestMapping(value = "/exist",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isPhoneExist(String phone)
+    {
+        Admin admin;
+        try
+        {
+            admin = adminService.searchAdminByPhone(phone);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return admin == null;
+    }
+
+    @RequestMapping(value = "/isused",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isAdminNameExist(String paramName,String paramValue)
+    {
+        Admin admin;
+        try
+        {
+            String pv = new String(paramValue.getBytes("iso-8859-1"), "utf-8");
+            if (paramName.trim().equals("") || pv.trim().equals(""))
+            {
+                return false;
+            }
+            admin = adminService.searchByParam(paramName,pv);
+        } catch (Exception e)
+        {
+            logger.error("根据名称查询操作员失败", e);
+            return false;
+        }
+        return admin == null;
+    }
+
+    @RequestMapping(value = "/nonentity/isused",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isNameBeUsed(Integer id,String paramName,String paramValue)
+    {
+        Admin admin;
+        try
+        {
+            String pv = new String(paramValue.getBytes("iso-8859-1"), "utf-8");
+            if (id == null || paramName == null || pv.trim().equals(""))
+            {
+                return false;
+            }
+            admin = adminService.searchByParam(paramName,pv);
+            if (admin == null)
+            {
+                return true;
+            }
+            admin = adminService.searchByIdAndParam(id,paramName,pv);
+        } catch (Exception e)
+        {
+            logger.error("根据名称查询操作员失败", e);
+            return false;
+        }
+        return admin != null;
+    }
+}

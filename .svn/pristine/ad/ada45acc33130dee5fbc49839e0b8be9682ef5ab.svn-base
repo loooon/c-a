@@ -1,0 +1,11 @@
+package com.credit.service;
+
+import com.credit.entity.Admin;
+
+/**
+ * Created by Michael Chan on 4/1/2017.
+ */
+public interface AdminService
+{
+    Admin searchByName(String userName);
+}

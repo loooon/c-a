@@ -1,0 +1,55 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" pageEncoding="UTF-8" %>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><sitemesh:write property='title' /></title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.6 -->
+    <link rel="stylesheet" href="/resources/AdminLTE/bootstrap/css/bootstrap.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/resources/AdminLTE/css/font-awesome-4.7.0/css/font-awesome.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="/resources/AdminLTE/css/ionicons-2.0.1/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/resources/AdminLTE/css/AdminLTE.css">
+    <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
+          page. However, you can choose any other skin. Make sure you
+          apply the skin class to the body tag so the changes take effect.
+    -->
+    <link rel="stylesheet" href="/resources/AdminLTE/css/skins/skin-green-light.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="/resources/AdminLTE/js/html5shiv.min.js"></script>
+    <script src="/resources/AdminLTE/js/respond.min.js"></script>
+    <![endif]-->
+    <%@ include file="/WEB-INF/common/common.jsp" %>
+    <!-- jQuery 2.2.3 -->
+    <script src="/resources/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- Bootstrap 3.3.6 -->
+    <script src="/resources/AdminLTE/bootstrap/js/bootstrap.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="/resources/AdminLTE/js/app.min.js"></script>
+</head>
+
+<body class="hold-transition skin-green-light sidebar-mini">
+<div class="wrapper">
+
+    <%@ include file="/WEB-INF/common/head.jsp" %>
+    <%@ include file="/WEB-INF/common/left.jsp" %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <sitemesh:write property="body"/>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <%@include file="/WEB-INF/common/footer.jsp" %>
+</div>
+
+</body>
+</html>
+

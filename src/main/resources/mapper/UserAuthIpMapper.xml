@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.credit.dao.UserAuthIpMapper" >
+    <resultMap id="BaseResultMap" type="com.credit.entity.UserAuthIp" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="user_vkey" property="userVkey" jdbcType="VARCHAR" />
+        <result column="authorized_ip" property="authorizedIp" jdbcType="VARCHAR" />
+        <result column="last_update_time" property="lastUpdateTime" jdbcType="TIMESTAMP" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, user_name, user_vkey, authorized_ip, last_update_time, user_id
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from tb_user_auth_ip
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+        delete from tb_user_auth_ip
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.credit.entity.UserAuthIp" >
+        insert into tb_user_auth_ip (id, user_name, user_vkey,
+        authorized_ip, last_update_time, user_id
+        )
+        values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{userVkey,jdbcType=VARCHAR},
+        #{authorizedIp,jdbcType=VARCHAR}, #{lastUpdateTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.credit.entity.UserAuthIp" >
+        insert into tb_user_auth_ip
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="userName != null" >
+                user_name,
+            </if>
+            <if test="userVkey != null" >
+                user_vkey,
+            </if>
+            <if test="authorizedIp != null" >
+                authorized_ip,
+            </if>
+            <if test="lastUpdateTime != null" >
+                last_update_time,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userName != null" >
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userVkey != null" >
+                #{userVkey,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizedIp != null" >
+                #{authorizedIp,jdbcType=VARCHAR},
+            </if>
+            <if test="lastUpdateTime != null" >
+                #{lastUpdateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.credit.entity.UserAuthIp" >
+        update tb_user_auth_ip
+        <set >
+            <if test="userName != null" >
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userVkey != null" >
+                user_vkey = #{userVkey,jdbcType=VARCHAR},
+            </if>
+            <if test="authorizedIp != null" >
+                authorized_ip = #{authorizedIp,jdbcType=VARCHAR},
+            </if>
+            <if test="lastUpdateTime != null" >
+                last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.credit.entity.UserAuthIp" >
+        update tb_user_auth_ip
+        set user_name = #{userName,jdbcType=VARCHAR},
+        user_vkey = #{userVkey,jdbcType=VARCHAR},
+        authorized_ip = #{authorizedIp,jdbcType=VARCHAR},
+        last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP},
+        user_id = #{userId,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <!--                  -->
+
+    <select id="selectByPage" resultType="com.credit.entity.dto.UserAuthIpDto" parameterType="com.credit.dao.query.UserQuery">
+        <![CDATA[
+        select u.user_id as userId, u.user_name as userName ,u.vkey as userVkey,group_concat(uai.authorized_ip separator '<br/>') as
+        authIps from tb_user as u LEFT JOIN tb_user_auth_ip as uai on uai.user_id = u.user_id
+          ]]>
+         <if test="userName!=null and userName !=''">
+            where u.user_name like concat(#{userName},'%')
+        </if>
+         group by u.user_id ORDER BY
+        <if test="sort.property != null and sort.property != ''">
+            u.${sort.property} ${sort.direction},
+        </if>
+        u.user_id DESC
+        <include refid="Page.footer"/>
+    </select>
+
+    <select id="countByPage" resultType="int" parameterType="com.credit.dao.query.UserQuery">
+        SELECT count(*) FROM (select count(*) from tb_user as u LEFT JOIN tb_user_auth_ip as uai on uai.user_id = u.user_id
+        <if test="userName!=null and userName !=''">
+            where u.user_name like concat(#{userName},'%')
+        </if>
+        group by u.user_id
+        ) as s
+    </select>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Integer" >
+        delete from tb_user_auth_ip
+        where user_id = #{userId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insertBatch"  parameterType="java.util.List">
+        insert into tb_user_auth_ip (id,user_id,user_name, user_vkey,
+        authorized_ip, last_update_time)
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id,jdbcType=INTEGER},#{item.userId,jdbcType=INTEGER}, #{item.userName,jdbcType=VARCHAR}, #{item.userVkey,jdbcType=VARCHAR},
+            #{item.authorizedIp,jdbcType=VARCHAR}, #{item.lastUpdateTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <select id="selectIpsByUserId" resultType="java.lang.String" parameterType="java.lang.Integer" >
+        <![CDATA[
+        select group_concat(authorized_ip separator '\r\n')
+        ]]>
+        from tb_user_auth_ip
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+</mapper>

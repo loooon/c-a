@@ -1,0 +1,13 @@
+package com.credit.service;
+
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.User;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+public interface UserService
+{
+    Pager<User> searchPage(UserQuery userQuery);
+}

@@ -1,0 +1,31 @@
+package com.credit.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.credit.dao.UserMapper;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.User;
+import com.credit.service.UserService;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+@Service("userService")
+public class UserServiceImpl implements UserService
+{
+    @Resource
+    private UserMapper userMapper;
+
+    @Override
+    public Pager<User> searchPage(UserQuery query)
+    {
+        List<User> userList = userMapper.selectByPage(query);
+        int count = userMapper.countByPage(query);
+        return new Pager<>(query, userList, count);
+    }
+}

@@ -1,0 +1,156 @@
+package com.credit.web.controller;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.credit.common.result.ResultJson;
+import com.credit.common.util.RandomUtil;
+import com.credit.common.web.xuser.XUser;
+import com.credit.common.web.xuser.XUserSessionManager;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.*;
+import com.credit.service.*;
+import com.credit.web.util.VkeyHelp;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+@Controller
+@RequestMapping("/user")
+public class UserController extends AbstractBaseController
+{
+    @Value("${sms.register.template}")
+    private String registerTemplate;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private SmsService smsService;
+
+    @Resource
+    private AdminService adminService;
+
+    @Resource
+    private UserPermissionService userPermissionService;
+
+    @Resource
+    private SiteResourceService siteResourceService;
+
+    @RequestMapping("/list")
+    public String toList()
+    {
+
+        return "/user_list";
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson list(UserQuery query)
+    {
+        Pager<User> userPage = userService.searchPage(query);
+        return new ResultJson().success(userPage);
+    }
+
+    @RequestMapping("/add")
+    public String addUser(Model model)
+    {
+        model.addAttribute("siteResources", getAllSiteResources());
+        return "/user_add";
+    }
+
+    @RequestMapping("/service")
+    @ResponseBody
+    public List<SiteResource> getAllSiteResources()
+    {
+       return siteResourceService.searchAll();
+    }
+
+    @RequestMapping(value = "/permission",method = RequestMethod.POST)
+    @ResponseBody
+    public List<UserPermission> getSiteResourcesByIds(Integer updateUser)
+    {
+        return userPermissionService.searchPermissionByIdsIn(updateUser);
+    }
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson ajaxAddUser(User user,Integer[] resourceIds)
+    {
+        try
+        {
+            if (user == null || user.getUserName() == null || resourceIds == null)
+            {
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR_MESSAGE);
+            }
+            XUser xUser = XUserSessionManager.getCurrent().getXUser();
+            String managerPhone = "";
+            if (xUser != null && !(xUser.getUserName() == null || xUser.getUserName().equals("")))
+            {
+                String adminName = xUser.getUserName();
+                Admin admin = adminService.searchByName(adminName);
+                managerPhone = admin.getPhone();
+            }
+            String password = RandomUtil.genRandomString(8);
+            String vkey = VkeyHelp.generateVkey(new Date());
+            userService.save(vkey,user,password,resourceIds);
+            String content = registerTemplate.replace("#companyName#", user.getUserName());
+            content = content.replace("#userNickName#", user.getUserNickname());
+            content = content.replace("#vkey#", vkey);
+            content = content.replace("#password#", password);
+            Sms sms = new Sms();
+            sms.setCreateTime(new Date());
+            sms.setReceiver(managerPhone);
+            sms.setSmsContent(content);
+//            smsService.saveSend(sms);
+        } catch (Exception e)
+        {
+            logger.error("添加用户异常", e);
+            return new ResultJson().error("添加用户异常");
+        }
+        return new ResultJson().success(user.getUserName());
+    }
+
+
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson updateUser(Integer userId,String vkey,Integer[] resourceIds)
+    {
+        Integer updateNumber = 0;
+        try
+        {
+            updateNumber = userPermissionService.update(userId, vkey, resourceIds);
+        } catch (Exception e)
+        {
+            logger.error("更新用户查询服务异常", e);
+            return new ResultJson().error("添加用户异常");
+        }
+        return new ResultJson().success(updateNumber);
+    }
+
+    @RequestMapping(value = "/exist",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isPhoneExist(String phone)
+    {
+        User user;
+        try
+        {
+            user = userService.searchUserByPhone(phone);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return user == null;
+    }
+}

@@ -1,0 +1,18 @@
+package com.credit.service;
+
+import java.util.List;
+
+import com.credit.entity.SiteResource;
+import com.credit.entity.UserPermission;
+
+/**
+ * Created by Michael Chan on 4/5/2017.
+ */
+public interface UserPermissionService
+{
+    int save(Integer userId,String vkey,Integer[] siteResourceIds);
+
+    List<UserPermission> searchPermissionByIdsIn(Integer resourceIds);
+
+    Integer update(Integer userId, String vkey, Integer[] phone);
+}

@@ -1,0 +1,16 @@
+jdbc.url=jdbc:mysql://127.0.0.1:3306/db_credit_site?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+jdbc.username=credit_site
+jdbc.password=PINGAN_Credit_Site@2017!
+jdbc.initialSize=0
+jdbc.maxActive=20
+jdbc.minIdle=0
+jdbc.maxWait=60000
+jdbc.validationQuery=SELECT 1
+jdbc.testOnBorrow=false
+jdbc.testOnReturn=false
+jdbc.testWhileIdle=true
+jdbc.timeBetweenEvictionRunsMillis=60000
+jdbc.minEvictableIdleTimeMillis=25200000
+jdbc.removeAbandoned=true
+jdbc.removeAbandonedTimeout=1800
+jdbc.logAbandoned=true

@@ -1,0 +1,41 @@
+package com.credit.common.web.xuser;
+
+public class XUser
+{
+
+    private String userName;
+
+    private Integer uid;
+
+    private boolean isSignedIn = false;
+
+    public boolean isSignedIn()
+    {
+        return isSignedIn;
+    }
+
+    public void setIsSignedIn(boolean isSignedIn)
+    {
+        this.isSignedIn = isSignedIn;
+    }
+
+    public Integer getUid()
+    {
+        return uid;
+    }
+
+    public void setUid(Integer uid)
+    {
+        this.uid = uid;
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+}

@@ -1,0 +1,134 @@
+package com.credit.common.web.xuser;
+
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Properties;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.credit.common.web.WebContext;
+
+
+public class XUserSessionManager
+{
+
+    private static final Logger logger = LoggerFactory.getLogger(XUserSessionManager.class);
+
+    private static String XUSER_SESSION_KEY = "user_session";
+
+    private static String CSRF_TOKEN_KEY = "csrf_token";
+
+    private static String XUSER_NAME_KEY = "xuser_n";
+
+    private static boolean isInit = false;
+
+    static
+    {
+        init();
+    }
+
+    public static String getXUserName()
+    {
+        String name = (String) WebContext.getRequest().getSession(true).getAttribute(XUSER_NAME_KEY);
+        if (StringUtils.isBlank(name))
+        {
+            name = getCookie(XUSER_NAME_KEY);
+        }
+
+        return name;
+    }
+
+    private static HttpSession getSession()
+    {
+        return WebContext.getRequest().getSession(true);
+    }
+
+    public static XUserSession getCurrent()
+    {
+        XUserSession session = (XUserSession) getSession().getAttribute(XUSER_SESSION_KEY);
+
+        if (session == null)
+        {
+            session = new XUserSession();
+            getSession().setAttribute(XUSER_SESSION_KEY, session);
+        }
+        return session;
+    }
+
+    public static void init()
+    {
+        init(null);
+
+    }
+
+    public static boolean isInit()
+    {
+        return isInit;
+    }
+
+    public static void init(XUser xuser)
+    {
+        isInit = true;
+        if (xuser == null)
+        {
+            String xUserName = getCookie(XUSER_NAME_KEY);
+            XUserSession.getCurrent().getXUser().setUserName(xUserName);
+            return;
+        }
+
+        XUserSession.getCurrent().setXUser(xuser);
+        setCookie(XUSER_NAME_KEY, xuser.getUserName());
+        setCookie(CSRF_TOKEN_KEY, XUserSession.getCurrent().getCsrfToken());
+
+    }
+
+    public static String getCookie(String name)
+    {
+        Cookie[] cookies = WebContext.getRequest().getCookies();
+        if(cookies!=null) {
+			for (Cookie cookie : cookies) {
+				if (StringUtils.equals(cookie.getName(), name)) {
+					return cookie.getValue();
+				}
+			}
+		}
+
+        return StringUtils.EMPTY;
+    }
+
+    public static void setCookie(String name, String value)
+    {
+        Cookie cookie = new Cookie(name, value);
+    /*    cookie.setDomain(getProperty("basic.domain"));
+        cookie.setPath("/");*/
+        WebContext.getResponse().addCookie(cookie);
+    }
+
+    private static String getProperty(String name)
+    {
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = XUserSessionManager.class.getClassLoader().getResourceAsStream("biz/common.properties");
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            return properties.getProperty(name);
+        }
+        catch (Exception e)
+        {
+            logger.error("", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(inputStream);
+        }
+
+        return StringUtils.EMPTY;
+    }
+}

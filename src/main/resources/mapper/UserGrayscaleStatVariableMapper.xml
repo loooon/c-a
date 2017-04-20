@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.credit.dao.UserGrayscaleStatVariableMapper" >
+  <resultMap id="BaseResultMap" type="com.credit.entity.UserGrayscaleStatVariable" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="variable_date" property="variableDate" jdbcType="VARCHAR" />
+    <result column="variable_time" property="variableTime" jdbcType="VARCHAR" />
+    <result column="variable_dun" property="variableDun" jdbcType="VARCHAR" />
+    <result column="user_vkey" property="userVkey" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="variable_id" property="variableId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, variable_date, variable_time, variable_dun, user_vkey, user_id, update_time, 
+    create_time, variable_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_user_grayscale_stat_variable
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_user_grayscale_stat_variable
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.credit.entity.UserGrayscaleStatVariable" >
+    insert into tb_user_grayscale_stat_variable (id, variable_date, variable_time, 
+      variable_dun, user_vkey, user_id, 
+      update_time, create_time, variable_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{variableDate,jdbcType=VARCHAR}, #{variableTime,jdbcType=VARCHAR}, 
+      #{variableDun,jdbcType=VARCHAR}, #{userVkey,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{variableId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.credit.entity.UserGrayscaleStatVariable" >
+    insert into tb_user_grayscale_stat_variable
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="variableDate != null" >
+        variable_date,
+      </if>
+      <if test="variableTime != null" >
+        variable_time,
+      </if>
+      <if test="variableDun != null" >
+        variable_dun,
+      </if>
+      <if test="userVkey != null" >
+        user_vkey,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="variableId != null" >
+        variable_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="variableDate != null" >
+        #{variableDate,jdbcType=VARCHAR},
+      </if>
+      <if test="variableTime != null" >
+        #{variableTime,jdbcType=VARCHAR},
+      </if>
+      <if test="variableDun != null" >
+        #{variableDun,jdbcType=VARCHAR},
+      </if>
+      <if test="userVkey != null" >
+        #{userVkey,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="variableId != null" >
+        #{variableId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.credit.entity.UserGrayscaleStatVariable" >
+    update tb_user_grayscale_stat_variable
+    <set >
+      <if test="variableDate != null" >
+        variable_date = #{variableDate,jdbcType=VARCHAR},
+      </if>
+      <if test="variableTime != null" >
+        variable_time = #{variableTime,jdbcType=VARCHAR},
+      </if>
+      <if test="variableDun != null" >
+        variable_dun = #{variableDun,jdbcType=VARCHAR},
+      </if>
+      <if test="userVkey != null" >
+        user_vkey = #{userVkey,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="variableId != null" >
+        variable_id = #{variableId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.credit.entity.UserGrayscaleStatVariable" >
+    update tb_user_grayscale_stat_variable
+    set variable_date = #{variableDate,jdbcType=VARCHAR},
+      variable_time = #{variableTime,jdbcType=VARCHAR},
+      variable_dun = #{variableDun,jdbcType=VARCHAR},
+      user_vkey = #{userVkey,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      variable_id = #{variableId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+    <!-- 以下为新增-->
+
+    <select id="selectByPage" parameterType="com.credit.dao.query.UserQuery" resultType="com.credit.entity.dto.UserGrayscaleStatDto">
+        <![CDATA[
+        select tugsv.id,tu.user_id as userId,tu.user_name as userName, tugsv.user_vkey as userVkey,
+       group_concat(tugsv.variable_date,tugsv.variable_time,tugsv.variable_dun,'_',tgv.variable_name separator '<br/>')
+         as allVariableName
+        from tb_user as tu LEFT JOIN tb_user_grayscale_stat_variable AS tugsv on tu.user_id = tugsv.user_id
+         ]]>
+        LEFT JOIN tb_grayscale_variable as tgv on tgv.id=tugsv.variable_id
+        <if test="userName!=null and userName !=''">
+            where tu.user_name like concat(#{userName},'%')
+        </if>
+        GROUP BY tu.user_id
+        ORDER BY
+        <if test="sort.property != null and sort.property != '' and sort.property == 'user_name'">
+            tu.${sort.property} ${sort.direction},
+        </if>
+        <if test="sort.property != null and sort.property != '' and sort.property != 'user_name'">
+            tugsv.${sort.property} ${sort.direction},
+        </if>
+        tugsv.id DESC
+        <include refid="Page.footer" />
+    </select>
+
+    <select id="countByPage" parameterType="com.credit.dao.query.UserQuery" resultType="int">
+        select count(*) FROM tb_user
+        <if test="userName!=null and userName !=''">
+            where tu.user_name like concat(#{userName},'%')
+        </if>
+    </select>
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultType="com.credit.entity.dto.UserGrayscaleStatDto">
+        select tgv.variable_name as variableName,tugsv.id,
+        tugsv.variable_date as variableDate,
+        tugsv.variable_time as variableTime,
+        tugsv.variable_dun as variableDun,
+        concat(tugsv.variable_date,tugsv.variable_time,tugsv.variable_dun) as conditionName,
+        tgv.description as variableDescription
+          from tb_user_grayscale_stat_variable tugsv
+          LEFT JOIN tb_grayscale_variable tgv
+          on tgv.id = tugsv.variable_id
+          where tugsv.user_id=#{userId}
+    </select>
+</mapper>

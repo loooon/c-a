@@ -1,0 +1,77 @@
+package com.credit.common.web.xuser;
+
+public class XUser
+{
+
+    private String userName;
+
+    private String roleName;
+
+    private Integer superAdmin;
+
+    private Integer uid;
+
+    private String createTime;
+
+    private boolean isSignedIn = false;
+
+    public boolean isSignedIn()
+    {
+        return isSignedIn;
+    }
+
+    public void setIsSignedIn(boolean isSignedIn)
+    {
+        this.isSignedIn = isSignedIn;
+    }
+
+    public Integer getUid()
+    {
+        return uid;
+    }
+
+    public void setUid(Integer uid)
+    {
+        this.uid = uid;
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+
+    public String getCreateTime()
+    {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime)
+    {
+        this.createTime = createTime;
+    }
+
+    public String getRoleName()
+    {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName)
+    {
+        this.roleName = roleName;
+    }
+
+    public Integer getSuperAdmin()
+    {
+        return superAdmin;
+    }
+
+    public void setSuperAdmin(Integer superAdmin)
+    {
+        this.superAdmin = superAdmin;
+    }
+}

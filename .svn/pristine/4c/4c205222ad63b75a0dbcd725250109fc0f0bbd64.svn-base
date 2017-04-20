@@ -1,0 +1,50 @@
+package com.credit.service.impl;
+
+import com.credit.dao.UserPermissionMapper;
+import com.credit.entity.SiteResource;
+import com.credit.entity.UserPermission;
+import com.credit.service.UserPermissionService;
+import org.springframework.stereotype.Service;
+
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by Michael Chan on 4/5/2017.
+ */
+@Service("userPermissionService")
+public class UserPermissionServiceImpl implements UserPermissionService
+{
+    @Resource
+    private UserPermissionMapper userPermissionMapper;
+
+    @Override
+    public int save(Integer userId,String vkey,Integer[] siteResourceIds)
+    {
+        List<UserPermission> userPermissions = new ArrayList<>();
+        for (Integer siteResource:siteResourceIds)
+        {
+            UserPermission userPermission = new UserPermission();
+            userPermission.setUserId(userId);
+            userPermission.setVkey(vkey);
+            userPermission.setResourceId(siteResource);
+            userPermissions.add(userPermission);
+        }
+        return userPermissionMapper.insertPermissionBatch(userPermissions);
+    }
+
+    @Override
+    public List<UserPermission> searchPermissionByIdsIn(Integer userId)
+    {
+        return userPermissionMapper.selectByUserId(userId);
+    }
+
+    @Override
+    public Integer update(Integer userId, String vkey, Integer[] siteResourceIds)
+    {
+        userPermissionMapper.deleteByUserId(userId);
+        return save(userId, vkey, siteResourceIds);
+    }
+}

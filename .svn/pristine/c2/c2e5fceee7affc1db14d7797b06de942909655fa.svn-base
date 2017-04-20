@@ -1,0 +1,284 @@
+package com.credit.web.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.credit.common.result.ResultJson;
+import com.credit.common.util.RandomUtil;
+import com.credit.common.web.xuser.XUser;
+import com.credit.common.web.xuser.XUserSessionManager;
+import com.credit.dao.query.Pager;
+import com.credit.dao.query.UserQuery;
+import com.credit.entity.*;
+import com.credit.entity.dto.UserResourceDto;
+import com.credit.service.*;
+import com.credit.web.model.SiteResourceModel;
+import com.credit.web.model.SrModal;
+import com.credit.web.util.PinYinUtil;
+import com.credit.web.util.VkeyHelp;
+
+/**
+ * Created by wangjunling on 2017/3/31.
+ */
+@Controller
+@RequestMapping("/user")
+public class UserController extends AbstractBaseController
+{
+    @Value("${sms.register.template}")
+    private String registerTemplate;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private SmsService smsService;
+
+    @Resource
+    private AdminService adminService;
+
+    @Resource
+    private UserPermissionService userPermissionService;
+
+    @Resource
+    private SiteResourceService siteResourceService;
+
+    @RequestMapping("/list")
+    public String toList()
+    {
+        return "/user_list";
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson list(UserQuery query)
+    {
+        Pager<UserResourceDto> userPage = userService.searchDtoPage(query);
+        return new ResultJson().success(userPage);
+    }
+
+    @RequestMapping("/add")
+    public String addUser(Model model)
+    {
+        model.addAttribute("siteResources", getAllSiteResources());
+        return "/user_add";
+    }
+
+    @RequestMapping("/update/resource")
+    public String addResource(Model model,Integer userId)
+    {
+        User user = userService.searchUserById(userId);
+        List<SiteResource> siteResources = getAllSiteResources();
+        List<UserPermission> userPermissions = getSiteResourcesByIds(userId);
+        List<SiteResourceModel> siteResourceModels =new ArrayList<>();
+        for (SiteResource siteResource:siteResources)
+        {
+            SiteResourceModel siteResourceModel = new SiteResourceModel();
+            siteResourceModel.setResourceId(siteResource.getResourceId());
+            siteResourceModel.setResourceName(siteResource.getResourceName());
+
+            for (UserPermission userPermission : userPermissions)
+            {
+                if(userPermission.getResourceId() == siteResource.getResourceId().intValue())
+                {
+                    siteResourceModel.setIsExist("checked");
+                    siteResourceModel.setDailyTimes(userPermission.getDailyTimes());
+                    siteResourceModel.setYearlyTimes(userPermission.getYearlyTimes());
+                    break;
+                }
+            }
+            siteResourceModels.add(siteResourceModel);
+        }
+        model.addAttribute("user", user);
+        model.addAttribute("userId", userId);
+        model.addAttribute("siteResourceModels", siteResourceModels);
+        return "/user_resource";
+    }
+
+    @RequestMapping("/service")
+    @ResponseBody
+    public List<SiteResource> getAllSiteResources()
+    {
+       return siteResourceService.searchAll();
+    }
+
+    @RequestMapping(value = "/permission",method = RequestMethod.POST)
+    @ResponseBody
+    public List<UserPermission> getSiteResourcesByIds(Integer updateUser)
+    {
+        return userPermissionService.searchPermissionByIdsIn(updateUser);
+    }
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson ajaxAddUser(User user)
+    {
+        try
+        {
+            if (user == null || user.getCompanyName() == null)
+            {
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR_MESSAGE);
+            }
+            XUser xUser = XUserSessionManager.getCurrent().getXUser();
+            String managerPhone = "";
+            if (xUser != null && !(xUser.getUserName() == null || xUser.getUserName().equals("")))
+            {
+                String adminName = xUser.getUserName();
+                Admin admin = adminService.searchByName(adminName);
+                managerPhone = admin.getPhone();
+            }
+            String password = RandomUtil.genRandomString(8);
+            String vkey = VkeyHelp.generateVkey(new Date());
+            String userName = generateUserName(user.getCompanyName(), user.getProductName());
+            if (UserNameExist(userName))
+            {
+                userName = generateUserName(user.getCompanyName(), user.getProductName());
+            }
+            userService.save(userName,vkey,user,password);
+            String content = registerTemplate.replace("#companyName#", user.getCompanyName());
+            content = content.replace("#userName#", userName);
+            content = content.replace("#vkey#", vkey);
+            content = content.replace("#password#", password);
+            Sms sms = new Sms();
+            sms.setCreateTime(new Date());
+            sms.setReceiver(managerPhone);
+            sms.setSmsContent(content);
+            smsService.saveSend(sms);
+        } catch (Exception e)
+        {
+            logger.error("添加用户异常", e);
+            return new ResultJson().error("添加用户异常");
+        }
+        return new ResultJson().success(user.getUserName());
+    }
+
+    private String generateUserName(String companyName, String productName)
+    {
+        String userName = "";
+        if (companyName.endsWith("股份有限公司"))
+        {
+            companyName = companyName.replace("股份有限公司", "");
+        }else if(companyName.endsWith("有限公司"))
+        {
+            companyName = companyName.replace("有限公司", "");
+        }else if(companyName.endsWith("公司"))
+        {
+            companyName = companyName.replace("公司", "");
+        }
+        String companyPinYinName = PinYinUtil.getFirstSpell(companyName);
+        String productPinYinName = PinYinUtil.getFirstSpell(productName);
+        if (StringUtils.isNotBlank(productPinYinName))
+        {
+            userName = productPinYinName + RandomUtil.genRandomNumberString(4);
+        }else {
+            userName = companyPinYinName + RandomUtil.genRandomNumberString(4);
+        }
+        return userName;
+    }
+
+    @RequestMapping(value = "/update/permission",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson updateUserPermission(SrModal srModal,String userName)
+    {
+        Integer updateNumber;
+        try
+        {
+            if (srModal.getSiteResourceModels().size() == 0)
+            {
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR_MESSAGE);
+            }
+            User user = userService.searchUserByUserName(userName);
+            Integer userId = null;
+            String vkey = "";
+            if (user != null)
+            {
+                userId = user.getUserId();
+                vkey = user.getVkey();
+            }
+            updateNumber = userPermissionService.update(userId, vkey,srModal);
+        } catch (Exception e)
+        {
+            logger.error("更新用户查询服务异常", e);
+            return new ResultJson().error("更新用户查询服务异常");
+        }
+        return new ResultJson().success(updateNumber);
+    }
+
+    @RequestMapping(value = "/update/baseinfo",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultJson updateUserBaseInfo(User user)
+    {
+        Integer updateNumber = 0;
+        try
+        {
+            if (user.getUserId() ==null || user.getExpireDate() == null)
+            {
+                return new ResultJson().error(ResultJson.STATUS_CODE_PARAM_ERROR_MESSAGE);
+            }
+            updateNumber = userService.updateUserBaseInfo(user);
+        } catch (Exception e)
+        {
+            logger.error("更新用户查询服务异常", e);
+            return new ResultJson().error("更新用户查询服务异常");
+        }
+        return new ResultJson().success(updateNumber);
+    }
+
+    @RequestMapping(value = "/exist/phone",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean PhoneExist(String phone)
+    {
+        User user;
+        try
+        {
+            user = userService.searchUserByPhone(phone);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return user == null;
+    }
+
+    @RequestMapping(value = "/exist/name",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean UserNameExist(String userName)
+    {
+        User user;
+        try
+        {
+            user = userService.searchUserByUserName(userName);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return user != null;
+    }
+
+    @RequestMapping(value = "/nonentity/name",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean UserNameNotExist(String userName)
+    {
+        User user;
+        try
+        {
+            user = userService.searchUserByUserName(userName);
+        } catch (Exception e)
+        {
+            logger.error("根据手机号查询用户失败", e);
+            return false;
+        }
+        return user == null;
+    }
+}
